@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  php-fpm:
+    build:
+      context: .
+      target: development
+      dockerfile: .sysadmin/docker/php-fpm/Dockerfile
+    working_dir: /var/www/html
+    user: www-data
+    volumes:
+      - .:/var/www/html:rw,cached
+
+  nginx:
+    build:
+      context: .
+      target: development
+      dockerfile: .sysadmin/docker/nginx/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - LISTEN_PORT=8080
+      - SERVER_NAME=localhost
+      - FPM_ADDRESS=php-fpm:9000
+    user: nginx
+    volumes:
+      - .sysadmin/docker/nginx/templates:/etc/nginx/templates
+      - .:/var/www/html:cached
